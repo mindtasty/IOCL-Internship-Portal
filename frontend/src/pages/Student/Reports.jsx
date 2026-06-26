@@ -260,7 +260,7 @@ export default function Reports() {
                           className="glass-panel border-slate-900 rounded-2xl p-5 space-y-4"
                         >
                           <div className="flex items-center justify-between border-b border-slate-800/60 pb-3">
-                            <span className="font-bold text-slate-200 text-sm">Week {rep.week_number} Progress Report</span>
+                            <span className="font-bold text-slate-600 text-sm">Week {rep.week_number} Progress Report</span>
                             <div className="flex items-center gap-2">
                               <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${
                                 rep.status === 'Approved' 
@@ -283,15 +283,15 @@ export default function Reports() {
 
                           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-400">
                             <div>
-                              <span className="font-bold text-slate-300">Tasks Completed</span>
+                              <span className="font-bold text-slate-500">Tasks Completed</span>
                               <p className="mt-1 leading-relaxed text-[11px]">{rep.tasks_performed}</p>
                             </div>
                             <div>
-                              <span className="font-bold text-slate-300">Key Learnings</span>
+                              <span className="font-bold text-slate-500">Key Learnings</span>
                               <p className="mt-1 leading-relaxed text-[11px]">{rep.what_learned}</p>
                             </div>
                             <div>
-                              <span className="font-bold text-slate-300">Challenges Faced</span>
+                              <span className="font-bold text-slate-500">Challenges Faced</span>
                               <p className="mt-1 leading-relaxed text-[11px]">{rep.challenges_faced}</p>
                             </div>
                           </div>
