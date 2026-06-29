@@ -13,6 +13,7 @@ router.get('/stats', requireRole(['Admin', 'HR', 'HOD', 'L&D']), adminController
 router.get('/users', requireRole(['Admin']), adminController.getUsers);
 router.post('/users', requireRole(['Admin']), adminController.createUser);
 router.put('/users/:id', requireRole(['Admin']), adminController.updateUser);
+router.delete('/users/:id', requireRole(['Admin']), adminController.deleteUser);
 
 // Department operations
 router.get('/departments', adminController.getDepartments); // Shared endpoint for forms

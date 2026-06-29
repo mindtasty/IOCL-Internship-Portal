@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import Sidebar from '../../components/Sidebar';
 import Navbar from '../../components/Navbar';
-import { Users, UserPlus, ShieldAlert, CheckCircle, Edit, Power, RefreshCw, KeyRound, X } from 'lucide-react';
+import { Users, UserPlus, ShieldAlert, CheckCircle, Edit, Power, RefreshCw, KeyRound, X, Trash2 } from 'lucide-react';
 
 export default function UserManagement() {
   const [users, setUsers] = useState([]);
@@ -187,6 +187,16 @@ export default function UserManagement() {
     }
   };
 
+  const handleDeleteUser = async (userItem) => {
+  if (!window.confirm(`Permanently delete ${userItem.first_name} ${userItem.last_name}? This cannot be undone.`)) return;
+  try {
+    await api.delete(`/admin/users/${userItem.id}`);
+    loadData();
+  } catch (err) {
+    alert(err.message || 'Failed to delete user.');
+  }
+};
+
   return (
     <div className="min-h-screen flex bg-slate-950 text-slate-100">
       <Sidebar />
@@ -281,6 +291,13 @@ export default function UserManagement() {
                               title={u.status === 'active' ? 'Disable Account' : 'Enable Account'}
                             >
                               <Power className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteUser(u)}
+                              className="p-1.5 rounded-lg border bg-slate-900 border-slate-800 text-rose-500 hover:bg-rose-500/10 hover:border-rose-500/20 transition-all"
+                              title="Delete Account"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </td>
                         </tr>

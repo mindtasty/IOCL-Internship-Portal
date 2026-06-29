@@ -210,11 +210,41 @@ async function getLogs(req, res) {
   }
 }
 
+// 8. Delete User Account
+async function deleteUser(req, res) {
+  const targetId  = parseInt(req.params.id);
+  const requesterId = req.user.id;
+
+  if (targetId === requesterId) {
+    return res.status(400).json({ message: 'You cannot delete your own account.' });
+  }
+
+  try {
+    const target = await db.query('SELECT id, role_id FROM users WHERE id = ?', [targetId]);
+    if (target.length === 0) return res.status(404).json({ message: 'User not found.' });
+
+    // Prevent deleting the last admin
+    if (target[0].role_id === 1) {
+      const adminCount = await db.query("SELECT COUNT(*) as count FROM users WHERE role_id = 1");
+      if (adminCount[0].count <= 1) {
+        return res.status(400).json({ message: 'Cannot delete the only Admin account.' });
+      }
+    }
+
+    await db.query('DELETE FROM users WHERE id = ?', [targetId]);
+    res.status(200).json({ message: 'User deleted successfully.' });
+  } catch (error) {
+    console.error('Delete user error:', error);
+    res.status(500).json({ message: 'Failed to delete user account.' });
+  }
+}
+
 module.exports = {
   getStats,
   getUsers,
   createUser,
   updateUser,
+  deleteUser,
   getDepartments,
   createDepartment,
   getLogs

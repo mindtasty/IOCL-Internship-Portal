@@ -9,7 +9,7 @@ const app = express();
 // Middlewares
 const allowedOrigins = [
   "http://localhost:5173",
-  "https:\\iocl-internship-portal.vercel.app"
+  "https://iocl-internship-portal.vercel.app"
 ];
 
 app.use(cors({
@@ -28,14 +28,6 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Create uploads directory if it doesn't exist
-const uploadsDir = path.join(__dirname, '../uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
-
-// Serve static uploaded files
-app.use('/uploads', express.static(uploadsDir));
 
 // Welcome route
 app.get('/', (req, res) => {

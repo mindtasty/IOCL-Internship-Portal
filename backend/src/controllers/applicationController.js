@@ -40,7 +40,7 @@ async function createApplication(req, res) {
           const docTypeName = type.charAt(0).toUpperCase() + type.slice(1); // 'Resume', 'Noc', etc.
           await db.query(
             'INSERT INTO application_documents (application_id, document_type, file_name, file_path, status) VALUES (?, ?, ?, ?, ?)',
-            [applicationId, docTypeName === 'Noc' ? 'NOC' : docTypeName, file.filename, file.path, 'Pending']
+            [applicationId, docTypeName === 'Noc' ? 'NOC' : docTypeName, file.originalname, file.path, 'Pending']
           );
         }
       }
@@ -88,14 +88,8 @@ async function getApplications(req, res) {
       queryStr += ' AND a.student_id = ?';
       queryParams.push(userId);
     } else if (roleName === 'HOD') {
-  queryStr += `
-    AND a.department_id = ?
-    AND a.status IN (
-      'Forwarded To HOD',
-      'Under HOD Review',
-      'HOD Approved'
-    )
-`;
+      // HODs see their department's applications
+      queryStr += ' AND a.department_id = ? AND a.status NOT IN (\'Draft\')';
       queryParams.push(departmentId);
     } else if (roleName === 'Mentor') {
       // Mentors see applications they are assigned to
@@ -317,7 +311,7 @@ async function resubmitApplication(req, res) {
           // Insert the corrected document
           await db.query(
             'INSERT INTO application_documents (application_id, document_type, file_name, file_path, status) VALUES (?, ?, ?, ?, ?)',
-            [applicationId, finalDocType, file.filename, file.path, 'Pending']
+            [applicationId, finalDocType, file.originalname, file.path, 'Pending']
           );
         }
       }

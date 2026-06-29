@@ -1,143 +1,124 @@
-// certificateController.js
 const db = require('../config/db');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 const { generateEvaluationSummaryPDF } = require('../utils/pdfGenerator');
 const { logActivity, createNotification } = require('../utils/helpers');
+require('dotenv').config();
 
-// 1. Submit Final Evaluation and Generate Performance Report Card PDF
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+function uploadBufferToCloudinary(buffer, publicId) {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload_stream(
+      { folder: 'iocl-portal/summaries', resource_type: 'raw', public_id: publicId, format: 'pdf' },
+      (error, result) => (error ? reject(error) : resolve(result))
+    ).end(buffer);
+  });
+}
+
 async function submitEvaluation(req, res) {
   const applicationId = req.params.id;
-  const evaluatorId = req.user.id;
-  const { 
-    technical_skills, 
-    learning_ability, 
-    communication, 
-    discipline, 
-    attendance_score, 
-    evaluation_remarks 
-  } = req.body;
+  const evaluatorId   = req.user.id;
+  const { technical_skills, learning_ability, communication, discipline, attendance_score, evaluation_remarks } = req.body;
 
   if (!technical_skills || !learning_ability || !communication || !discipline || !attendance_score) {
     return res.status(400).json({ message: 'All evaluation scores (1 to 5) are required.' });
   }
 
   try {
-    // 1. Verify application is active
     const apps = await db.query(
-      `SELECT a.*, u.first_name as student_first, u.last_name as student_last, d.name as department_name, d.code as department_code
+      `SELECT a.*, u.first_name as student_first, u.last_name as student_last,
+              d.name as department_name, d.code as department_code
        FROM applications a
        JOIN users u ON a.student_id = u.id
        JOIN departments d ON a.department_id = d.id
        WHERE a.id = ?`,
       [applicationId]
     );
-
-    if (apps.length === 0) {
-      return res.status(404).json({ message: 'Application not found.' });
-    }
-
+    if (apps.length === 0) return res.status(404).json({ message: 'Application not found.' });
     const application = apps[0];
-    if (application.status !== 'Internship Active' && application.status !== 'Internship Completed') {
-      return res.status(400).json({ message: 'Evaluation can only be submitted for active or completed internships.' });
+
+    if (!['Internship Active', 'Internship Completed'].includes(application.status)) {
+      return res.status(400).json({ message: 'Evaluation can only be submitted for active internships.' });
     }
 
-    // 2. Fetch Mentor / Evaluator name
     const evaluators = await db.query('SELECT first_name, last_name FROM users WHERE id = ?', [evaluatorId]);
     const evaluatorName = evaluators.length > 0 ? `${evaluators[0].first_name} ${evaluators[0].last_name}` : 'Mentor';
 
-    // 3. Define path for PDF storage
-    const pdfFilename = `summary-${applicationId}-${Date.now()}.pdf`;
-    const relativePath = `uploads/${pdfFilename}`;
-    const absolutePath = path.join(__dirname, '../../uploads', pdfFilename);
-
-    // 4. Compile data block for PDF
     const pdfData = {
       studentName: `${application.student_first} ${application.student_last}`,
-      department: application.department_name,
+      department:  application.department_name,
       companyName: application.company_name,
-      mentorName: evaluatorName,
-      title: application.internship_title,
-      startDate: new Date(application.start_date).toLocaleDateString(),
-      endDate: new Date(application.end_date).toLocaleDateString(),
-      technical_skills,
-      learning_ability,
-      communication,
-      discipline,
-      attendance_score,
-      evaluation_remarks
+      mentorName:  evaluatorName,
+      title:       application.internship_title,
+      startDate:   new Date(application.start_date).toLocaleDateString(),
+      endDate:     new Date(application.end_date).toLocaleDateString(),
+      technical_skills, learning_ability, communication, discipline, attendance_score, evaluation_remarks,
     };
 
-    // Generate PDF document asynchronously
-    await generateEvaluationSummaryPDF(pdfData, absolutePath);
+    const pdfBuffer  = await generateEvaluationSummaryPDF(pdfData);
+    const publicId   = `summary-${applicationId}-${Date.now()}`;
+    const uploaded   = await uploadBufferToCloudinary(pdfBuffer, publicId);
+    const fileUrl    = uploaded.secure_url;
 
-    // 5. Save/Replace record in internship_summaries
     await db.query(
-      'INSERT INTO internship_summaries (application_id, technical_skills, learning_ability, communication, discipline, attendance_score, evaluation_remarks, file_path, evaluated_by) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(application_id) DO UPDATE SET technical_skills = excluded.technical_skills, learning_ability = excluded.learning_ability, communication = excluded.communication, discipline = excluded.discipline, attendance_score = excluded.attendance_score, evaluation_remarks = excluded.evaluation_remarks, file_path = excluded.file_path, evaluated_by = excluded.evaluated_by',
-      [
-        applicationId,
-        technical_skills,
-        learning_ability,
-        communication,
-        discipline,
-        attendance_score,
-        evaluation_remarks || null,
-        relativePath,
-        evaluatorId
-      ]
+      `INSERT INTO internship_summaries
+         (application_id, technical_skills, learning_ability, communication, discipline, attendance_score, evaluation_remarks, file_path, evaluated_by)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+       ON CONFLICT(application_id) DO UPDATE SET
+         technical_skills  = excluded.technical_skills,
+         learning_ability  = excluded.learning_ability,
+         communication     = excluded.communication,
+         discipline        = excluded.discipline,
+         attendance_score  = excluded.attendance_score,
+         evaluation_remarks= excluded.evaluation_remarks,
+         file_path         = excluded.file_path,
+         evaluated_by      = excluded.evaluated_by`,
+      [applicationId, technical_skills, learning_ability, communication, discipline,
+       attendance_score, evaluation_remarks || null, fileUrl, evaluatorId]
     );
 
-    // Log Activity & Create Notification
-    await logActivity(applicationId, evaluatorId, 'Final Evaluation Submitted', `Evaluation report compiled and generated by ${evaluatorName}.`);
-    await createNotification(
-      application.student_id,
-      'Internship Evaluation Completed',
-      'Your mentor has submitted your final performance evaluation. You can now view the scorecard.'
-    );
+    await logActivity(applicationId, evaluatorId, 'Final Evaluation Submitted', `Evaluation compiled by ${evaluatorName}.`);
+    await createNotification(application.student_id, 'Internship Evaluation Completed',
+      'Your mentor has submitted your final performance evaluation. You can now view the scorecard.');
 
-    res.status(200).json({ message: 'Evaluation card saved and PDF generated successfully.', pdfUrl: `/${relativePath}` });
+    res.status(200).json({ message: 'Evaluation saved successfully.', pdfUrl: fileUrl });
   } catch (error) {
     console.error('Submit evaluation error:', error);
     res.status(500).json({ message: 'Failed to record evaluation summary.' });
   }
 }
 
-// 2. Upload Completion Certificate (Admin / HR action)
 async function uploadCertificate(req, res) {
   const applicationId = req.params.id;
-  const uploaderId = req.user.id;
+  const uploaderId    = req.user.id;
 
-  if (!req.file) {
-    return res.status(400).json({ message: 'Please upload a PDF certificate file.' });
-  }
+  if (!req.file) return res.status(400).json({ message: 'Please upload a PDF certificate file.' });
 
   try {
-    // Verify application
     const apps = await db.query('SELECT student_id, status FROM applications WHERE id = ?', [applicationId]);
-    if (apps.length === 0) {
-      return res.status(404).json({ message: 'Application not found.' });
-    }
+    if (apps.length === 0) return res.status(404).json({ message: 'Application not found.' });
 
-    const application = apps[0];
-
-    const relativePath = `uploads/${req.file.filename}`;
-
-    // 1. Insert or update certificates record
+    // req.file.path = Cloudinary secure_url (set by multer-storage-cloudinary)
     await db.query(
-      'INSERT INTO certificates (application_id, file_name, file_path, uploaded_by) VALUES (?, ?, ?, ?) ON CONFLICT(application_id) DO UPDATE SET file_name = excluded.file_name, file_path = excluded.file_path, uploaded_by = excluded.uploaded_by',
-      [applicationId, req.file.originalname, relativePath, uploaderId]
+      `INSERT INTO certificates (application_id, file_name, file_path, uploaded_by)
+       VALUES (?, ?, ?, ?)
+       ON CONFLICT(application_id) DO UPDATE SET
+         file_name   = excluded.file_name,
+         file_path   = excluded.file_path,
+         uploaded_by = excluded.uploaded_by`,
+      [applicationId, req.file.originalname, req.file.path, uploaderId]
     );
 
-    // 2. Update status of application to Internship Completed
     await db.query("UPDATE applications SET status = 'Internship Completed' WHERE id = ?", [applicationId]);
 
-    // Log & notify
-    await logActivity(applicationId, uploaderId, 'Certificate Distributed', 'Admin/HR uploaded completion certificate and closed internship.');
-    await createNotification(
-      application.student_id,
-      'Internship Completed!',
-      'Congratulations! Your completion certificate has been uploaded. You can now download your certificate and evaluation summary.'
-    );
+    await logActivity(applicationId, uploaderId, 'Certificate Distributed',
+      'Admin/HR uploaded completion certificate and closed internship.');
+    await createNotification(apps[0].student_id, 'Internship Completed!',
+      'Congratulations! Your completion certificate has been uploaded. Download it from the Completion Portal.');
 
     res.status(200).json({ message: 'Certificate uploaded and internship completed successfully.' });
   } catch (error) {
@@ -146,7 +127,4 @@ async function uploadCertificate(req, res) {
   }
 }
 
-module.exports = {
-  submitEvaluation,
-  uploadCertificate
-};
+module.exports = { submitEvaluation, uploadCertificate };

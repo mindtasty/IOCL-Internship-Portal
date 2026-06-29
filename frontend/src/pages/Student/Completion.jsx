@@ -43,7 +43,7 @@ export default function Completion() {
   }
 
   const downloadFile = (filePath) => {
-    window.open(`http://localhost:5000/${filePath}`, '_blank');
+    window.open(filePath, '_blank');
   };
 
   return (

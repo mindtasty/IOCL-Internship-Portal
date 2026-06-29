@@ -285,7 +285,7 @@ export default function InternDetail() {
                       <div key={doc.id} className="py-2.5 flex items-center justify-between text-xs first:pt-0 last:pb-0">
                         <span className="font-medium text-slate-500">{doc.document_type}</span>
                         <button
-                          onClick={() => window.open(`http://localhost:5000/${doc.file_path}`, '_blank')}
+                          onClick={() => window.open(doc.file_path, '_blank')}
                           className="text-slate-600 hover:text-slate-400 flex items-center gap-1 font-bold text-[10px]"
                         >
                           View PDF <ExternalLink className="w-3 h-3" />
@@ -721,7 +721,7 @@ export default function InternDetail() {
                     {appDetails.summary?.file_path ? (
                       <button
                         type="button"
-                        onClick={() => window.open(`http://localhost:5000/${appDetails.summary.file_path}`, '_blank')}
+                        onClick={() => window.open(appDetails.summary.file_path, '_blank')}
                         className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-xs font-semibold text-slate-300 flex items-center gap-1.5"
                       >
                         View Generated Summary PDF
