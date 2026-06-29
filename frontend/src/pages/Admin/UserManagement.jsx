@@ -249,12 +249,12 @@ export default function UserManagement() {
                     <tbody className="divide-y divide-slate-900">
                       {users.map(u => (
                         <tr key={u.id} className="hover:bg-slate-900/10 transition-colors">
-                          <td className="py-4 font-bold text-slate-200">
+                          <td className="py-4 font-bold text-slate-400">
                             {u.first_name} {u.last_name}
                           </td>
-                          <td className="py-4 font-semibold text-slate-300">{u.email}</td>
+                          <td className="py-4 font-semibold text-slate-400">{u.email}</td>
                           <td className="py-4">
-                            <span className="inline-flex px-2 py-0.5 rounded text-[9px] font-bold bg-slate-900 border border-slate-800 text-slate-300 uppercase">
+                            <span className="inline-flex px-2 py-0.5 rounded text-[9px] font-bold bg-slate-900 border border-slate-800 text-slate-400 uppercase">
                               {u.role_name}
                             </span>
                           </td>

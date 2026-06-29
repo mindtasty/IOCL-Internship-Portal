@@ -137,7 +137,7 @@ export default function DepartmentManagement() {
                   <div className="overflow-x-auto">
                     <table className="w-full text-xs text-slate-400">
                       <thead>
-                        <tr className="border-b border-slate-900 text-slate-500 font-bold uppercase text-[10px]">
+                        <tr className="border-b border-slate-900 text-slate-600 font-bold uppercase text-[10px]">
                           <th className="py-2.5 text-left">ID</th>
                           <th className="py-2.5 text-left">Code</th>
                           <th className="py-2.5 text-left">Department Name</th>
@@ -148,8 +148,8 @@ export default function DepartmentManagement() {
                         {departments.map((d) => (
                           <tr key={d.id} className="hover:bg-slate-900/10">
                             <td className="py-3 font-semibold text-slate-500">{d.id}</td>
-                            <td className="py-3 font-bold text-slate-200">{d.code}</td>
-                            <td className="py-3 text-slate-300 font-semibold">{d.name}</td>
+                            <td className="py-3 font-bold text-slate-400">{d.code}</td>
+                            <td className="py-3 text-slate-400 font-semibold">{d.name}</td>
                             <td className="py-3 text-slate-500">
                               {new Date(d.created_at).toLocaleDateString()}
                             </td>

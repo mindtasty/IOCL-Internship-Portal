@@ -139,7 +139,7 @@ export default function AdminOverview() {
 
         {/* Informative Help Guide Card */}
         <div className="glass-panel border-slate-800 rounded-2xl p-6 h-fit space-y-4">
-          <h4 className="font-bold text-sm text-slate-200">System Overrides Info</h4>
+          <h4 className="font-bold text-sm text-slate-600">System Overrides Info</h4>
           <p className="text-xs text-slate-400 leading-relaxed">
             As an Administrator, you have total access privileges to every module in the portal. 
             You can:
