@@ -49,7 +49,7 @@ export default function Logs() {
 
               <button
                 onClick={fetchLogs}
-                className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white transition-all flex items-center gap-1.5 text-xs font-semibold"
+                className="p-2.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 transition-all flex items-center gap-1.5 text-xs font-semibold"
               >
                 <RefreshCw className="w-3.5 h-3.5" /> Reload Logs
               </button>

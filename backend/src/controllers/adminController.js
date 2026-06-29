@@ -68,8 +68,8 @@ async function createUser(req, res) {
     const passwordHash = await bcrypt.hash(password, salt);
 
     const result = await db.query(
-      'INSERT INTO users (email, password_hash, role_id, first_name, last_name, department_id, phone, status) VALUES (?, ?, ?, ?, ?, ?, ?, "active")',
-      [email, passwordHash, role_id, first_name, last_name, department_id || null, phone || null]
+      'INSERT INTO users (email, password_hash, role_id, first_name, last_name, department_id, phone, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+      [email, passwordHash, role_id, first_name, last_name, department_id || null, phone || null, 'active']
     );
 
     const newUserId = result.insertId;

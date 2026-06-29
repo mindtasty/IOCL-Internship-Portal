@@ -148,9 +148,9 @@ export default function DepartmentManagement() {
                         {departments.map((d) => (
                           <tr key={d.id} className="hover:bg-slate-900/10">
                             <td className="py-3 font-semibold text-slate-500">{d.id}</td>
-                            <td className="py-3 font-bold text-slate-400">{d.code}</td>
-                            <td className="py-3 text-slate-400 font-semibold">{d.name}</td>
-                            <td className="py-3 text-slate-500">
+                            <td className="py-3 font-bold text-slate-600">{d.code}</td>
+                            <td className="py-3 text-slate-600 font-semibold">{d.name}</td>
+                            <td className="py-3 text-slate-600">
                               {new Date(d.created_at).toLocaleDateString()}
                             </td>
                           </tr>
