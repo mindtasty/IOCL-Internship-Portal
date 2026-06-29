@@ -3,6 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs');
+const setupRoutes = require('./routes/setup');
 
 const app = express();
 
@@ -27,6 +28,7 @@ app.use(cors({
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use('/api/setup', setupRoutes);
 
 
 // Welcome route
