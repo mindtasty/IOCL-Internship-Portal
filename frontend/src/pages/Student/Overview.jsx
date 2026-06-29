@@ -68,12 +68,12 @@ export default function StudentOverview() {
         <div className="glass-panel rounded-3xl p-8 space-y-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="space-y-2">
-              <div className="w-16 h-16 bg-accent-500/10 border border-accent-500/20 text-accent-600 rounded-2xl flex items-center justify-center">
+              <div className="w-16 h-16 bg-slate-500/10 border border-slate-500/20 text-slate-600 rounded-2xl flex items-center justify-center">
                 <FileText className="w-8 h-8" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-slate-100">Start Your Internship Application</h2>
-                <p className="text-sm text-slate-400 max-w-2xl leading-relaxed">
+                <h2 className="text-2xl font-bold text-slate-600">Start Your Internship Application</h2>
+                <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
                   Prepare these documents first, then submit your application. After submission, you can track every approval step from HR to HOD, Mentor, and L&D in the timeline tracker.
                 </p>
               </div>
