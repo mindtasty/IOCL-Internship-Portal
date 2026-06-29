@@ -138,7 +138,13 @@ export default function ApplicationDetail() {
   const { application, documents, activityLogs, mentor, certificate, summary } = appDetails;
 
   const openDocument = (filePath) => {
-    window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(filePath)}`, '_blank')
+    const link = document.createElement('a');
+    link.href = filePath;
+    link.target = '_blank';
+    link.download = '';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
