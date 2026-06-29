@@ -13,7 +13,7 @@ cloudinary.config({
 function uploadBufferToCloudinary(buffer, publicId) {
   return new Promise((resolve, reject) => {
     cloudinary.uploader.upload_stream(
-      { folder: 'iocl-portal/summaries', resource_type: 'raw', public_id: publicId, format: 'pdf' },
+      { folder: 'iocl-portal/summaries', resource_type: 'auto', public_id: publicId },
       (error, result) => (error ? reject(error) : resolve(result))
     ).end(buffer);
   });
