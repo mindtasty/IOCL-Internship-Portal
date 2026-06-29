@@ -212,7 +212,7 @@ export default function ApplicationDetail() {
 
                           <button
                             onClick={() => downloadDocument(doc.file_path)}
-                            className="text-slate-400 hover:text-slate-200 flex items-center gap-1.5 text-xs font-semibold transition-colors"
+                            className="text-slate-700 hover:text-slate-200 flex items-center gap-1.5 text-xs font-semibold transition-colors"
                           >
                             Download PDF
                           </button>
