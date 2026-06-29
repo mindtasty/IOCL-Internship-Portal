@@ -137,10 +137,14 @@ export default function ApplicationDetail() {
 
   const { application, documents, activityLogs, mentor, certificate, summary } = appDetails;
 
-  const openDocument = (filePath) => {
-    // Insert fl_attachment flag into Cloudinary raw URL
-    const url = filePath.replace('/raw/upload/', '/raw/upload/fl_attachment/');
-    window.open(url, '_blank');
+  const downloadDocument = (filePath) => {
+    if (!filePath) {
+      alert("Document not found.");
+      return;
+    }
+
+    // Force the browser to navigate directly to the Cloudinary URL
+    window.location.href = filePath;
   };
 
   return (
@@ -207,10 +211,9 @@ export default function ApplicationDetail() {
                           )}
 
                           <button
-                            onClick={() => openDocument(doc.file_path)}
-                            className="px-2.5 py-1.5 rounded bg-slate-900 border border-slate-850 hover:border-slate-700 text-slate-400 hover:text-white text-[10px] font-bold flex items-center gap-1 transition-all"
+                            onClick={() => downloadDocument(doc.file_path)}
                           >
-                            Open PDF <ExternalLink className="w-3 h-3" />
+                            Download PDF
                           </button>
                         </div>
 
