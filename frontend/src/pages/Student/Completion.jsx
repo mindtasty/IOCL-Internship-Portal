@@ -43,7 +43,7 @@ export default function Completion() {
   }
 
   const downloadFile = (filePath) => {
-    window.open(filePath, '_blank');
+    window.open(`https://docs.google.com/viewer?url=${encodeURIComponent(filePath)}`, '_blank')
   };
 
   return (
