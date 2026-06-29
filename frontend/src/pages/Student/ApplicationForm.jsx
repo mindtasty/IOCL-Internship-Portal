@@ -277,7 +277,7 @@ export default function ApplicationForm() {
 
             <form className="glass-panel border-slate-950/40 rounded-3xl p-6 space-y-6">
               <div className="space-y-4">
-                <h3 className="font-bold text-sm text-slate-200 border-b border-slate-900 pb-2 flex items-center gap-2">
+                <h3 className="font-bold text-sm text-slate-500 border-b border-slate-900 pb-2 flex items-center gap-2">
                   <FileText className="w-4.5 h-4.5 text-slate-500" />
                   Internship Profile Information
                 </h3>
@@ -334,7 +334,7 @@ export default function ApplicationForm() {
 
               {/* Document uploads */}
               <div className="space-y-4 pt-4 border-t border-slate-900">
-                <h3 className="font-bold text-sm text-slate-200 pb-2 flex items-center gap-2">
+                <h3 className="font-bold text-sm text-slate-500 pb-2 flex items-center gap-2">
                   <FileUp className="w-4.5 h-4.5 text-slate-500" />
                   Upload Documents (PDF Only)
                 </h3>
