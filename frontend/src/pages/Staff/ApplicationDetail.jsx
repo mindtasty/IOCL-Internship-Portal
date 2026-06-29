@@ -212,7 +212,9 @@ export default function ApplicationDetail() {
 
                           <button
                             onClick={() => downloadDocument(doc.file_path)}
-                          >
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-300 rounded-lg shadow-sm text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200"
+                            >
+                              <Download size={18} />
                             Download PDF
                           </button>
                         </div>

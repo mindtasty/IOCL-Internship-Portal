@@ -13,7 +13,8 @@ const storage = new CloudinaryStorage({
   cloudinary,
   params: async (req, file) => ({
     folder:        'iocl-portal/documents',
-    resource_type: 'raw',
+    resource_type: 'image',
+    format: 'pdf',
     public_id:     `${file.fieldname}-${Date.now()}-${Math.round(Math.random() * 1e9)}`,
   }),
 });
