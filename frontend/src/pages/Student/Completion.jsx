@@ -42,14 +42,10 @@ export default function Completion() {
     );
   }
 
-  const downloadFile = (filePath) => {
-    const link = document.createElement('a');
-    link.href = filePath;
-    link.target = '_blank';
-    link.download = '';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+  const openDocument = (filePath) => {
+    // Insert fl_attachment flag into Cloudinary raw URL
+    const url = filePath.replace('/raw/upload/', '/raw/upload/fl_attachment/');
+    window.open(url, '_blank');
   };
 
   return (
